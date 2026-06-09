@@ -62,15 +62,15 @@ If cost were not a constraint in production, the main tradeoffs for a stronger e
 
 ## Evaluation Plan
 
-The questions below are designed to test whether retrieval can recover thread context, not whether the model can invent broad advice.
+The questions below are designed to test whether retrieval can recover thread context, not whether the model can invent broad advice. Each expected answer contains concrete facts from the community corpus.
 
 | # | Question | Expected answer |
-|---|----------|-----------------|
-| 1 | What do students say is the difference between CSC 205 and CSC 215? | CSC 215 is usually described as the more advanced option or the one with a different programming emphasis; the answer should mention the practical distinction rather than just repeating the catalog title. |
-| 2 | What advice is given for transferring from NOVA CS to GMU? | The answer should mention transfer planning, keeping the sequence aligned with the target degree, and checking which CS/math/physics courses count cleanly toward the transfer path. |
-| 3 | Which physics sequence do students recommend for engineering-oriented transfer, and when should each option be used? | The answer should distinguish between the easier/non-calculus path and the calculus-based options, and explain that the right choice depends on the student’s math readiness and transfer target. |
-| 4 | What do students say about studying for MTH 288 discrete math? | The answer should mention that consistent practice, proof-style thinking, and early work on homework are recommended, rather than last-minute memorization. |
-| 5 | Do the CS classes at NOVA use C, or do they use another language? | The answer should state that students discuss course language expectations rather than claiming all CS classes use one language; it should identify the language used in the relevant class discussion if present. |
+|---|---|---|
+| 1 | What do students say is the difference between CSC 205 and CSC 215? | CSC 205 focuses on Computer Organization and aligns with GMU's computer science requirements, while CSC 215 focuses on Computer Systems and is typically required for Virginia Tech (VT) transfers. |
+| 2 | What advice is given for transferring from NOVA CS to GMU? | Students emphasize utilizing the ADVANCE pathway program to guarantee credit matching, ensuring math sequences (like Discrete Math and Calculus) are completed before transferring to avoid graduation delays. |
+| 3 | Which physics sequence do students recommend for engineering-oriented transfer, and when should each option be used? | Students specify that University Physics (PHYS 231/232) is calculus-based and mandatory for Engineering and rigorous CS degrees, whereas College Physics (PHYS 201/202) is algebra-based and will not satisfy engineering transfer agreements. |
+| 4 | What do students say about studying for MTH 288 discrete math? | Successful students recommend using external video resources like Professor Leonard, focus heavily on understanding mathematical proofs over rote memorization, and warn that the workload requires consistent weekly practice. |
+| 5 | Do the CS classes at NOVA use C, or do they use another language? | The core CSC 22X sequence at NOVA does not use C as its primary language; CSC 221 uses Python for introductory concepts, while CSC 222 and CSC 223 transition entirely to Java utilizing the Zybooks platform. |
 
 ---
 
