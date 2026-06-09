@@ -19,16 +19,16 @@ These sources cover course sequencing, transfer planning, physics/calculus choic
 
 | # | Source | Description | URL or location |
 |---|--------|-------------|-----------------|
-| 1 | r/nvcc thread: CSC 205 vs CSC 215 | Differences in course scope, difficulty, and transfer value | https://www.reddit.com/r/nvcc/comments/1nrcl22/difference_between_csc_205_and_215/ |
-| 2 | r/nvcc thread: CS transfer to GMU | Transfer path discussion for CS students | https://www.reddit.com/r/nvcc/comments/1py0foc/computer_science_transfer_to_gmu/ |
-| 3 | r/nvcc thread: UVA engineering transfer | Engineering transfer advice and course sequencing | https://www.reddit.com/r/nvcc/comments/1tbqwyy/uva_engineering_transfer/ |
-| 4 | r/nvcc thread: EGR 122 | Engineering course workload and expectations | https://www.reddit.com/r/nvcc/comments/1slg28j/egr_122/ |
-| 5 | r/nvcc thread: MTH 288 studying advice | Discrete math study strategies and pacing | https://www.reddit.com/r/nvcc/comments/syzpm2/discrete_math_mth_288_studying_advice/ |
-| 6 | r/nvcc thread: Physics questions | General physics placement and course advice | https://www.reddit.com/r/nvcc/comments/1phvpbd/physics_questions/ |
-| 7 | r/nvcc thread: PHYS 102 vs 201 vs 231 | Choosing the right physics sequence | https://www.reddit.com/r/nvcc/comments/pe9h81/phys_102_vs_201_vs_231/ |
-| 8 | r/nvcc thread: Do CS classes use C? | Language expectations for CS coursework | https://www.reddit.com/r/nvcc/comments/1r8kn5c/do_any_of_the_computer_science_classes_use_c/ |
-| 9 | r/nvcc thread: Calculus 1 online | Online calculus experience and workload | https://www.reddit.com/r/nvcc/comments/1802sil/calculus_1_online/ |
-| 10 | NOVA wiki index | Community-maintained index and reference pages | https://www.reddit.com/r/nvcc/wiki/index/ |
+| 1 | r/nvcc thread: CSC 221 course advice | Prep pathways, waivers, and external resources (Java MOOC, Professor Leonard) | https://www.reddit.com/r/nvcc/comments/xcujjw/please_advise_me_regarding_csc221_course/ |
+| 2 | r/nvcc thread: CSC 223 conceptual discussion | Data Structures conceptual leap and transfer student reflections | https://www.reddit.com/r/nvcc/comments/1d3qzwx/csc_223/ |
+| 3 | r/nvcc thread: CSC 223 summer-semester details | Exam formats, Zybooks reliance, and grading policies | https://www.reddit.com/r/nvcc/comments/1txt0tq/csc_223/ |
+| 4 | r/nvcc thread: The Zybooks situation | Discussion on VCCS CSC 22X overhaul and Zybooks integration | https://www.reddit.com/r/nvcc/comments/ymwqzt/the_zybooks_situation/ |
+| 5 | r/nvcc thread: Computer Science major question | Course alignment and elective vs core requirement clarifications | https://www.reddit.com/r/nvcc/comments/18jfmba/computer_science_major_question/ |
+| 6 | r/nvcc thread: MTH 288 studying advice | Aggregated student strategies for Discrete Math mastery | https://www.reddit.com/r/nvcc/comments/syzpm2/discrete_math_mth_288_studying_advice/ |
+| 7 | r/nvcc thread: EGR 122 evaluation | Engineering Design teaching models and CAD project expectations | https://www.reddit.com/r/nvcc/comments/qf9b29/egr_122/ |
+| 8 | r/nvcc thread: PHYS 232 with Prof Medvar | University Physics II lab and exam practicalities | https://www.reddit.com/r/nvcc/comments/uzgmh7/phys_232_with_prof_medvar/ |
+| 9 | r/nvcc thread: Transfer from A.S. Engineering to CS | Administrative steps and course-matching pitfalls | https://www.reddit.com/r/nvcc/comments/1t92mmm/transfer_from_as_engineering_to_cs_degree_at_va/ |
+| 10 | NOVA wiki index | Community transfer wiki with automated credit-matching pipelines | https://www.reddit.com/r/nvcc/wiki/index/ |
 
 ---
 
