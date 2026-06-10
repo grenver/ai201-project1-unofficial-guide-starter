@@ -1,162 +1,119 @@
 # The Unofficial Guide — Project 1
 
-> **How to use this template:**
-> Complete each section *after* you've built and tested the corresponding part of your system.
-> Do not write placeholder text — if a section isn't done yet, leave it blank and come back.
-> Every section below is required for submission. One-liners will not receive full credit.
+> Complete each section after you have built and tested the corresponding part of your system.
+> This README documents the final system, its evaluation, and the main tradeoffs you made.
 
 ---
 
 ## Domain
 
-<!-- What topic or category of knowledge does your system cover?
-     Why is this knowledge valuable, and why is it hard to find through official channels?
-     Example: "Student reviews of CS professors at [university] — useful because official
-     course descriptions don't reflect teaching style, exam difficulty, or workload." -->
+This system covers unofficial student knowledge about the Computer Science and Engineering path at Northern Virginia Community College (NOVA). The corpus focuses on transfer paths, course difficulty, workload advice, and sequencing decisions that are rarely captured in official catalogs. That information is valuable because the official course descriptions explain requirements, but they do not explain what students actually experience in class, how transfer pathways behave in practice, or which courses are risky to take out of sequence.
 
 ---
 
 ## Document Sources
 
-<!-- List every source you collected documents from.
-     Be specific: include URLs, subreddit names, forum thread titles, or file names.
-     Aim for variety — sources that together cover different subtopics or perspectives. -->
+The project uses 10 Reddit-based sources from `r/nvcc` plus the community wiki. Together they cover transfer planning, programming sequence advice, discrete math study strategies, engineering design, physics choices, and course language expectations.
 
 | # | Source | Type | URL or file path |
 |---|--------|------|-----------------|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
-| 6 | | | |
-| 7 | | | |
-| 8 | | | |
-| 9 | | | |
-| 10 | | | |
+| 1 | CSC 221 course advice | Reddit thread | https://www.reddit.com/r/nvcc/comments/xcujjw/please_advise_me_regarding_csc221_course/ |
+| 2 | CSC 223 conceptual discussion | Reddit thread | https://www.reddit.com/r/nvcc/comments/1d3qzwx/csc_223/ |
+| 3 | CSC 223 summer-semester details | Reddit thread | https://www.reddit.com/r/nvcc/comments/1txt0tq/csc_223/ |
+| 4 | The ZyBooks situation | Reddit thread | https://www.reddit.com/r/nvcc/comments/ymwqzt/the_zybooks_situation/ |
+| 5 | Computer Science major question | Reddit thread | https://www.reddit.com/r/nvcc/comments/18jfmba/computer_science_major_question/ |
+| 6 | MTH 288 studying advice | Reddit thread | https://www.reddit.com/r/nvcc/comments/syzpm2/discrete_math_mth_288_studying_advice/ |
+| 7 | EGR 122 evaluation | Reddit thread | https://www.reddit.com/r/nvcc/comments/qf9b29/egr_122/ |
+| 8 | PHYS 232 with Prof Medvar | Reddit thread | https://www.reddit.com/r/nvcc/comments/uzgmh7/phys_232_with_prof_medvar/ |
+| 9 | Transfer from A.S. Engineering to CS | Reddit thread | https://www.reddit.com/r/nvcc/comments/1t92mmm/transfer_from_as_engineering_to_cs_degree_at_va/ |
+| 10 | NOVA wiki index | Community wiki | https://www.reddit.com/r/nvcc/wiki/index/ |
 
 ---
 
 ## Chunking Strategy
 
-<!-- Describe your chunking approach with enough specificity that someone else could reproduce it.
-     Include:
-     - Chunk size (characters or tokens) and why that size fits your documents
-     - Overlap size and why (or why not) you used overlap
-     - Any preprocessing you did before chunking (e.g., stripping HTML, removing headers)
-     - What your final chunk count was across all documents -->
+**Chunk size:** 1200 characters
 
-**Chunk size:**
+**Overlap:** 250 characters
 
-**Overlap:**
+**Why these choices fit your documents:** Reddit comments are short, but they are often context-dependent and full of pronouns like “that class,” “his professor,” or “this sequence.” A recursive character splitter is a good fit because it preserves natural breaks first and only falls back to a hard cutoff when needed. The 1200-character target keeps chunks small enough to stay topic-focused while still preserving the parent post or enough comment history to make a standalone chunk meaningful.
 
-**Why these choices fit your documents:**
+The 250-character overlap helps preserve local context across boundaries so a course code, professor name, or transfer note does not get separated from the comment that refers to it. Before chunking, the ingestion script strips HTML markup, decodes entities, removes boilerplate, and prepends the thread title and original post body into each comment chunk.
 
-**Final chunk count:**
+**Final chunk count:** 243
 
 ---
 
 ## Embedding Model
 
-<!-- Name the embedding model you used and explain your choice.
-     Then answer: if you were deploying this system for real users and cost wasn't a constraint,
-     what tradeoffs would you weigh in choosing a different model?
-     Consider: context length limits, multilingual support, accuracy on domain-specific text,
-     latency, and local vs. API-hosted. -->
+**Model used:** `all-MiniLM-L6-v2` via `sentence-transformers`
 
-**Model used:**
-
-**Production tradeoff reflection:**
+**Production tradeoff reflection:** `all-MiniLM-L6-v2` is a good local baseline because it is fast, compact, and good enough for short forum text. If cost were not a constraint, I would weigh stronger multilingual support, better handling of domain-specific phrasing, and more robust semantic matching against latency, memory usage, and local deployment simplicity. For this project, the lightweight model was the better fit because the corpus is small, the deployment is local, and the main challenge is conversational context rather than long-document reasoning.
 
 ---
 
 ## Grounded Generation
 
-<!-- Explain how your system enforces grounding — how does it prevent the LLM from answering
-     beyond the retrieved documents?
-     Describe both your system prompt (what instruction you gave the model) and any structural
-     choices (e.g., how you formatted the context, whether you filtered low-relevance chunks).
-     Do not just say "I told it to use the documents" — show the actual instruction or explain
-     the mechanism. -->
+**System prompt grounding instruction:** The assistant is instructed to answer only from the retrieved context blocks, to avoid using outside knowledge, to cite every factual claim inline with source labels such as `[Source A]`, and to return exactly `I don't have enough information on that.` if the retrieved context does not contain enough specific facts.
 
-**System prompt grounding instruction:**
-
-**How source attribution is surfaced in the response:**
+**How source attribution is surfaced in the response:** The app formats retrieved chunks into labeled source blocks, then returns a deduplicated source list alongside the answer. The visible UI has one output field for the answer and one output field for the source list, so the user can see both the generated response and the documents that supported it.
 
 ---
 
 ## Evaluation Report
 
-<!-- Run your 5 test questions from planning.md through your system and record the results.
-     Be honest — a partially accurate or inaccurate result that you explain well is more
-     valuable than a suspiciously perfect result. -->
+I ran the five evaluation questions from `planning.md` against the actual ingested corpus after clearing and repopulating ChromaDB from the 243 chunks generated by `ingest.py`.
 
 | # | Question | Expected answer | System response (summarized) | Retrieval quality | Response accuracy |
 |---|----------|-----------------|------------------------------|-------------------|-------------------|
-| 1 | | | | | |
-| 2 | | | | | |
-| 3 | | | | | |
-| 4 | | | | | |
-| 5 | | | | | |
+| 1 | What do students say is the difference between CSC 205 and CSC 215? | CSC 205 focuses on Computer Organization and aligns with GMU's computer science requirements, while CSC 215 focuses on Computer Systems and is typically required for Virginia Tech (VT) transfers. | The model said CSC 205 focuses on Computer Organization and aligns with GMU, while CSC 215 focuses on Computer Systems and is typically required for VT transfers, with an inline citation. | Relevant | Accurate |
+| 2 | What advice is given for transferring from NOVA CS to GMU? | Students emphasize utilizing the ADVANCE pathway program to guarantee credit matching, ensuring math sequences are completed before transferring to avoid graduation delays. | The model recommended using the transfer equivalency chart and the ADVANCE pathway program, and it also noted that math should be completed before transfer. | Relevant | Accurate |
+| 3 | Which physics sequence do students recommend for engineering-oriented transfer, and when should each option be used? | University Physics (PHYS 231/232) is calculus-based and mandatory for Engineering and rigorous CS degrees, while College Physics (PHYS 201/202) is algebra-based and will not satisfy engineering transfer agreements. | The model returned the fallback: `I don't have enough information on that.` | Partially relevant | Inaccurate |
+| 4 | What do students say about studying for MTH 288 discrete math? | Successful students recommend using external video resources like Professor Leonard, focus on understanding proofs over rote memorization, and warn that the workload requires consistent weekly practice. | The model recommended reviewing homework, using Professor Leonard on YouTube, and practicing consistently until the material becomes second nature. | Relevant | Accurate |
+| 5 | Do the CS classes at NOVA use C, or do they use another language? | The core CSC 22X sequence at NOVA does not use C as its primary language; CSC 221 uses Python, while CSC 222 and CSC 223 transition to Java using ZyBooks. | The model returned the fallback: `I don't have enough information on that.` | Off-target | Inaccurate |
 
-**Retrieval quality:** Relevant / Partially relevant / Off-target  
+**Retrieval quality:** Relevant / Partially relevant / Off-target
+
 **Response accuracy:** Accurate / Partially accurate / Inaccurate
 
 ---
 
 ## Failure Case Analysis
 
-<!-- Identify at least one question where retrieval or generation did not work as expected.
-     Write a specific explanation of *why* it failed, tied to a part of the pipeline.
+**Question that failed:** Which physics sequence do students recommend for engineering-oriented transfer, and when should each option be used?
 
-     "The answer was wrong" is not an explanation.
+**What the system returned:** `I don't have enough information on that.`
 
-     "The relevant information was split across a chunk boundary, so retrieval returned
-     only half the context — the model didn't have enough to answer correctly" is an explanation.
+**Root cause (tied to a specific pipeline stage):** Retrieval returned physics-related chunks, but the top-k context did not present the full comparison in one place. The generator was correctly strict and refused to infer the missing half of the answer. In other words, the issue was not hallucination; it was incomplete retrieval coverage for a question that required combining multiple facts across the corpus.
 
-     "The embedding model treated the professor's nickname as out-of-vocabulary and returned
-     results from an unrelated review" is an explanation. -->
-
-**Question that failed:**
-
-**What the system returned:**
-
-**Root cause (tied to a specific pipeline stage):**
-
-**What you would change to fix it:**
+**What you would change to fix it:** I would add a better retrieval heuristic for course-number-heavy questions, potentially raise top-k for physics-style comparisons, and create a small normalization layer that groups related sequence questions together so the answer can see the PHYS 231/232 versus PHYS 201/202 contrast in one prompt.
 
 ---
 
 ## Spec Reflection
 
-<!-- Reflect on how planning.md shaped your implementation.
-     Answer both questions with at least 2–3 sentences each. -->
+**One way the spec helped you during implementation:** The planning document made the grounding strategy concrete before I wrote code. Because I had already committed to a strict fallback response, inline citations, and a top-k retrieval setting, the implementation choices in `ingest.py`, `retrieval_engine.py`, and `app.py` were all aligned around context preservation and answer traceability rather than around producing the longest possible answer.
 
-**One way the spec helped you during implementation:**
-
-**One way your implementation diverged from the spec, and why:**
+**One way your implementation diverged from the spec, and why:** During development I initially seeded the vector store with mock chunks so the retrieval layer and UI could be tested immediately before the full corpus was wired in. That diverged from the ideal end state of evaluating directly on the ingested documents, but it made the milestone runnable earlier and let me confirm the Groq and Gradio integration before the final corpus repopulation step.
 
 ---
 
 ## AI Usage
 
-<!-- Describe at least 2 specific instances where you used an AI tool during this project.
-     For each: what did you give the AI as input, what did it produce, and what did you
-     change, override, or direct differently?
-
-     "I used Claude to help me code" is not sufficient.
-     "I gave Claude my Chunking Strategy section from planning.md and asked it to implement
-     chunk_text(). It returned a function using a fixed character split. I overrode the
-     chunk size from 500 to 200 because my documents are short reviews, not long guides." -->
-
 **Instance 1**
 
-- *What I gave the AI:*
-- *What it produced:*
-- *What I changed or overrode:*
+- *What I gave the AI:* My `planning.md` chunking and retrieval spec, plus the `requirements.txt` file.
+- *What it produced:* A first-pass `ingest.py` that parsed Reddit exports, recursed through nested comments, preserved parent-thread context, and printed validation chunks.
+- *What I changed or overrode:* I fixed the wiki-page edge case, adjusted metadata normalization, and made the chunking output more robust for the actual Reddit export format in `documents/`.
 
 **Instance 2**
 
-- *What I gave the AI:*
-- *What it produced:*
-- *What I changed or overrode:*
+- *What I gave the AI:* The retrieval requirements for Milestone 4, including persistent ChromaDB, `all-MiniLM-L6-v2`, and the structured result format.
+- *What it produced:* A Chroma-backed retrieval engine with upsert and query functions plus a built-in smoke test.
+- *What I changed or overrode:* I added query-aligned mock chunks for immediate testing, then repopulated the vector store with the real ingested corpus before running the final milestone evaluation.
+
+**Instance 3**
+
+- *What I gave the AI:* The Milestone 5 grounding and interface requirements, including strict fallback behavior and inline source labels.
+- *What it produced:* A Gradio app that connects the retriever to Groq and returns both an answer and a source list.
+- *What I changed or overrode:* I kept the interface intentionally minimal so the grounding behavior stayed obvious, and I made the error handling return user-facing messages instead of crashing the server thread when the API key or network is unavailable.
