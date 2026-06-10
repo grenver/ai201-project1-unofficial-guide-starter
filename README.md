@@ -6,6 +6,14 @@
 
 ---
 
+## Demo Video
+
+📹 **[Watch the 3–5 minute demo](https://www.loom.com/share/4c921576ec8f4eed94e65e40ec1d3b23)**
+
+The walkthrough shows three queries answered with visible source citations, one query where retrieval and generation work well, the physics question where the system correctly refuses (the documented failure case), and a tour of the evaluation report.
+
+---
+
 ## Domain
 
 This system covers unofficial student knowledge about the Computer Science and Engineering path at Northern Virginia Community College (NOVA). The corpus focuses on transfer paths, course difficulty, workload advice, programming-language expectations, and sequencing decisions that are rarely captured in official catalogs. That information is valuable because the official course descriptions explain requirements, but they do not explain what students actually experience in class, how transfer pathways behave in practice, or which courses are risky to take out of sequence.
