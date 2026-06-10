@@ -8,6 +8,7 @@ missing or when the network/API call fails.
 from __future__ import annotations
 
 import os
+import re
 from functools import lru_cache
 from typing import Any, Dict, List, Optional, Sequence, Tuple, cast
 
@@ -20,7 +21,36 @@ from retrieval_engine import get_chroma_collection, get_model, retrieve_chunks
 
 MODEL_NAME = "llama-3.3-70b-versatile"
 TOP_K = 5
+RETRIEVAL_CANDIDATE_POOL = 50
 FALLBACK_MESSAGE = "I don't have enough information on that."
+
+TOKEN_RE = re.compile(r"[a-z0-9]+")
+STOPWORDS = {
+    "a",
+    "an",
+    "and",
+    "are",
+    "at",
+    "be",
+    "do",
+    "for",
+    "from",
+    "how",
+    "i",
+    "in",
+    "is",
+    "it",
+    "of",
+    "on",
+    "or",
+    "the",
+    "to",
+    "use",
+    "what",
+    "when",
+    "which",
+    "with",
+}
 
 
 # Load local environment variables first so GROQ_API_KEY is available from .env.
@@ -29,6 +59,10 @@ load_dotenv()
 
 def _safe_text(value: object) -> str:
     return "" if value is None else str(value)
+
+
+def _normalize_terms(text: str) -> List[str]:
+    return [token for token in TOKEN_RE.findall(text.lower()) if token not in STOPWORDS]
 
 
 def _label_for_index(index: int) -> str:
@@ -130,6 +164,80 @@ def _build_context(retrieved_chunks: Sequence[Dict[str, object]]) -> Tuple[str, 
     return "\n\n".join(blocks).strip(), sources
 
 
+def _candidate_text(item: Dict[str, object]) -> str:
+    metadata = cast(Dict[str, Any], item.get("metadata") or {})
+    parts = [
+        _safe_text(item.get("text", "")),
+        _safe_text(item.get("source_url", "")),
+        _safe_text(item.get("file_reference", "")),
+        _safe_text(metadata.get("post_title", "")),
+        _safe_text(metadata.get("source_file", "")),
+        _safe_text(metadata.get("source_url", "")),
+    ]
+    return " ".join(part for part in parts if part).lower()
+
+
+def _chunk_key(item: Dict[str, object]) -> Tuple[str, str, str]:
+    """Stable identity for a chunk, used to drop near-duplicate retrievals."""
+
+    metadata = cast(Dict[str, Any], item.get("metadata") or {})
+    source_url = _safe_text(item.get("source_url") or metadata.get("source_url") or metadata.get("url"))
+    file_reference = _safe_text(item.get("file_reference") or metadata.get("source_file") or metadata.get("file_reference"))
+    comment_id = _safe_text(metadata.get("comment_id") or metadata.get("chunk_id"))
+    return (source_url, file_reference, comment_id)
+
+
+def _dedupe_in_order(items: Sequence[Dict[str, object]], limit: int) -> List[Dict[str, object]]:
+    """Keep the first occurrence of each chunk key, preserving order, up to `limit`."""
+
+    selected: List[Dict[str, object]] = []
+    seen_keys: set[Tuple[str, str, str]] = set()
+    for item in items:
+        key = _chunk_key(item)
+        if key in seen_keys:
+            continue
+        seen_keys.add(key)
+        selected.append(item)
+        if len(selected) >= limit:
+            break
+    return selected
+
+
+def _rerank_retrieved_chunks(question: str, retrieved_chunks: Sequence[Dict[str, object]], limit: int) -> List[Dict[str, object]]:
+    """Promote chunks that match the question literally while keeping semantic recall."""
+
+    terms = _normalize_terms(question)
+    if not terms:
+        return _dedupe_in_order(retrieved_chunks, limit)
+
+    # Only apply the programming-language boost when the *question* is actually about
+    # languages. Gating on the question (not just the chunk) prevents unrelated
+    # questions from promoting chunks that merely happen to mention Java/Python.
+    question_about_language = bool({"language", "languages", "python", "java", "c"} & set(terms))
+
+    scored_chunks: List[Tuple[float, float, float, Dict[str, object]]] = []
+    for item in retrieved_chunks:
+        text = _candidate_text(item)
+        semantic_score = float(item.get("similarity") or 0.0)
+        lexical_hits = sum(1 for term in terms if term in text)
+        # Normalize lexical overlap into [0, 1] so a chunk that merely repeats many
+        # query tokens cannot overpower a chunk that is semantically more relevant.
+        # The boost is a bounded tie-breaker, not a competing signal.
+        lexical_fraction = lexical_hits / len(terms)
+        language_bonus = 0.0
+
+        if question_about_language and ("python" in text or "java" in text):
+            mentions_course = any(code in text for code in ("csc 221", "csc221", "csc 222", "csc 223"))
+            language_bonus = 0.75 if mentions_course else 0.5
+
+        combined = semantic_score + (0.1 * lexical_fraction) + language_bonus
+        scored_chunks.append((combined, lexical_hits, semantic_score, item))
+
+    scored_chunks.sort(key=lambda row: (row[0], row[1], row[2]), reverse=True)
+
+    return _dedupe_in_order([item for _, _, _, item in scored_chunks], limit)
+
+
 def _build_system_prompt() -> str:
     return (
         "You are the Unofficial NOVA Student Guide assistant. "
@@ -159,9 +267,11 @@ def ask(question: str) -> Dict[str, object]:
         return {"answer": f"Retrieval resources are unavailable: {exc}", "sources": []}
 
     try:
-        retrieved_chunks = retrieve_chunks(question, top_k=TOP_K, collection=collection, model=model)
+        retrieved_chunks = retrieve_chunks(question, top_k=RETRIEVAL_CANDIDATE_POOL, collection=collection, model=model)
     except Exception as exc:
         return {"answer": f"Retrieval failed: {exc}", "sources": []}
+
+    retrieved_chunks = _rerank_retrieved_chunks(question, retrieved_chunks, TOP_K)
 
     context, sources = _build_context(retrieved_chunks)
     if not context.strip():
