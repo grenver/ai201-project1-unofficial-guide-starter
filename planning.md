@@ -64,10 +64,12 @@ If cost were not a constraint in production, the main tradeoffs for a stronger e
 
 The questions below are designed to test whether retrieval can recover thread context, not whether the model can invent broad advice. Each expected answer contains concrete facts from the community corpus.
 
+> Update note: Q1 originally read "difference between CSC 205 and CSC 215," but the collected corpus contains no thread on those courses, so a correct answer could only have come from outside the documents. It was replaced with a CSC 221-vs-222 placement question the corpus genuinely answers. Q2 was generalized from GMU-specific to any four-year CS/engineering transfer.
+
 | # | Question | Expected answer |
 |---|---|---|
-| 1 | What do students say is the difference between CSC 205 and CSC 215? | CSC 205 focuses on Computer Organization and aligns with GMU's computer science requirements, while CSC 215 focuses on Computer Systems and is typically required for Virginia Tech (VT) transfers. |
-| 2 | What advice is given for transferring from NOVA CS to GMU? | Students emphasize utilizing the ADVANCE pathway program to guarantee credit matching, ensuring math sequences (like Discrete Math and Calculus) are completed before transferring to avoid graduation delays. |
+| 1 | Should a complete beginner take CSC 221, or skip straight to CSC 222? | Complete beginners should take CSC 221 for a solid foundation; students with prior programming experience can request to skip to CSC 222 (whose first weeks review CSC 221 material). |
+| 2 | What advice is given for transferring from NOVA to a four-year CS or engineering program? | Don't chase the "easiest" classes; build a real foundation; a course-waiver form with documentation can substitute for a class; expect a difficulty jump after transferring. |
 | 3 | Which physics sequence do students recommend for engineering-oriented transfer, and when should each option be used? | Students specify that University Physics (PHYS 231/232) is calculus-based and mandatory for Engineering and rigorous CS degrees, whereas College Physics (PHYS 201/202) is algebra-based and will not satisfy engineering transfer agreements. |
 | 4 | What do students say about studying for MTH 288 discrete math? | Successful students recommend using external video resources like Professor Leonard, focus heavily on understanding mathematical proofs over rote memorization, and warn that the workload requires consistent weekly practice. |
 | 5 | Do the CS classes at NOVA use C, or do they use another language? | The core CSC 22X sequence at NOVA does not use C as its primary language; CSC 221 uses Python for introductory concepts, while CSC 222 and CSC 223 transition entirely to Java utilizing the Zybooks platform. |
@@ -79,6 +81,8 @@ The questions below are designed to test whether retrieval can recover thread co
 1. Reddit comments often depend on parent-post context, so a standalone comment can look meaningless or even contradictory if the chunk boundary removes the referenced class, professor, or transfer path. Mitigation: store parent title, parent body, thread URL, comment depth, and parent comment ID in metadata, and include the parent context text in the chunk before embedding.
 
 2. Informal student advice mixes facts, opinions, and outdated course details, so retrieval can surface a confident but stale answer from an older thread. Mitigation: keep source timestamps in metadata, prefer chunks with explicit course codes and transfer terms, and add a lightweight ranking rule that boosts direct answers with matching course numbers while demoting vague conversational side remarks.
+
+> Implementation update: the course-number boost above had to be re-scoped during development. A raw keyword boost over-promoted lexically dense but off-topic chunks (e.g. the CSC-223 transfer thread captured a CSC-221-vs-222 question). The shipped reranker (`app.py`) uses a *normalized, bounded* lexical nudge plus a *question-gated* programming-language bonus, so keyword overlap nudges ordering without overriding semantic relevance.
 
 ---
 
