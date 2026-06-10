@@ -14,7 +14,7 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Sequence
+from typing import Any, Dict, List, Optional, Sequence
 
 import chromadb
 from sentence_transformers import SentenceTransformer
@@ -132,7 +132,7 @@ def _build_id(chunk: ChunkRecord, index: int) -> str:
 
 def populate_vector_db(
     chunks: Sequence[Any],
-    collection=None,
+    collection: Any | None = None,
     model: Optional[SentenceTransformer] = None,
 ) -> int:
     """Embed and upsert a chunk list into ChromaDB.
@@ -194,7 +194,7 @@ def _format_result(item: Dict[str, Any]) -> Dict[str, Any]:
 def retrieve_chunks(
     query: str,
     top_k: int = DEFAULT_TOP_K,
-    collection=None,
+    collection: Any | None = None,
     model: Optional[SentenceTransformer] = None,
 ) -> List[Dict[str, Any]]:
     """Return the nearest chunks for a natural-language query."""
